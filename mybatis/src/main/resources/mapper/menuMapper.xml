@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.husen.dao.mapper.MenuMapper">
+    <delete id="deleteMenuById" parameterType="Long">
+        DELETE FROM t_menu WHERE menuId = #{menuId}
+    </delete>
+
+    <insert id="save" parameterType="com.husen.dao.po.MenuPo">
+        INSERT INTO t_menu (menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable)
+        VALUES (#{menuId}, #{name}, #{url}, #{level}, #{icon}, #{fatherMenuId}, #{permissionId}, #{buttonOrMenu}, #{isEnable})
+    </insert>
+
+    <select id="topMenus" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE level = 1
+    </select>
+
+    <select id="countByFatherMenuId" parameterType="Long" resultType="Integer">
+        SELECT COUNT(menuId) FROM t_menu WHERE fatherMenuId = #{fatherMenuId}
+    </select>
+
+    <select id="middleMenus" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE fatherMenuId = #{menuId}
+    </select>
+
+    <select id="bottomMenus" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE fatherMenuId = #{menuId}
+    </select>
+
+    <select id="buttons" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE fatherMenuId = #{menuId}
+    </select>
+
+    <select id="findByFatherId" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE fatherMenuId = #{menuId}
+    </select>
+
+    <select id="findByUrl" parameterType="String" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, level, icon, fatherMenuId, permissionId, buttonOrMenu, isEnable FROM t_menu WHERE url = #{requestURI}
+    </select>
+
+    <select id="countById" parameterType="Long" resultType="Integer">
+        SELECT COUNT(menuId) FROM t_menu WHERE menuId = #{menuId}
+    </select>
+
+    <update id="updateMenusStatus" parameterType="java.util.List">
+        <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+            UPDATE t_menu
+              <set>
+                  isEnable = ${item.isEnable}
+              </set>
+            WHERE menuId = ${item.menuId}
+        </foreach>
+    </update>
+
+    <select id="findById" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, icon, level, permissionId, fatherMenuId, buttonOrMenu, isEnable FROM t_menu WHERE menuId = #{menuId}
+    </select>
+
+    <update id="updateMenuById" parameterType="com.husen.dao.po.MenuPo">
+        UPDATE t_menu SET name = #{name}, url = #{url}, icon = #{icon} WHERE menuId = #{menuId}
+    </update>
+
+    <select id="findByPermissionId" parameterType="Long" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, isEnable FROM t_menu WHERE permissionId = #{permissionId}
+    </select>
+
+    <select id="notBeSelected" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name FROM t_menu WHERE permissionId IS NULL
+    </select>
+
+    <update id="clearPermission" parameterType="Long">
+        UPDATE t_menu SET permissionId = null WHERE permissionId = #{permissionId}
+    </update>
+
+    <update id="addPermission" parameterType="com.husen.dao.vo.PermissionMenuVo">
+        UPDATE t_menu SET permissionId = #{permissionId} WHERE menuId = #{menuId}
+    </update>
+
+    <select id="findAll" resultType="com.husen.dao.po.MenuPo">
+        SELECT menuId, name, url, isEnable FROM t_menu
+    </select>
+</mapper>

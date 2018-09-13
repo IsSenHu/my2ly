@@ -1,0 +1,14 @@
+package com.husen.service.rabbit;
+
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageListener;
+
+/**
+ * Created by HuSen on 2018/7/3 10:45.
+ */
+public class FanoutFirstService implements MessageListener {
+    @Override
+    public void onMessage(Message message) {
+        System.out.println("######FanoutFirstService:" + message);
+    }
+}

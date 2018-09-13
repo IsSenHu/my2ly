@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.husen.dao.mapper.PermissionMapper">
+    <insert id="save" parameterType="com.husen.dao.po.PermissionPo">
+        INSERT INTO t_permission (permissionId, name, description) VALUES (#{permissionId}, #{name}, #{description})
+    </insert>
+
+    <select id="findByName" parameterType="String" resultType="com.husen.dao.po.PermissionPo">
+        SELECT permissionId, name, description, menuId FROM t_permission WHERE name = #{name}
+    </select>
+
+    <select id="findById" parameterType="Long" resultType="com.husen.dao.po.PermissionPo">
+        SELECT permissionId, name, description, menuId FROM t_permission WHERE permissionId = #{permissionId}
+    </select>
+
+    <select id="count" parameterType="com.husen.dao.po.RolePo" resultType="Integer">
+        SELECT COUNT(permissionId) FROM t_permission WHERE 1 = 1
+        <if test="permissionId != null">
+            AND permissionId LIKE CONCAT('%', #{permissionId}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            AND name LIKE CONCAT('%', #{name}, '%')
+        </if>
+    </select>
+
+    <select id="page" parameterType="com.husen.dao.vo.PageReqVo" resultType="com.husen.dao.po.PermissionPo">
+        SELECT permissionId, name, description FROM t_permission WHERE 1 = 1
+        <if test="params != null">
+            <if test="params.permissionId != null">
+                AND permissionId LIKE CONCAT('%', #{params.permissionId}, '%')
+            </if>
+            <if test="params.name != null and params.name != ''">
+                AND name LIKE CONCAT('%', #{params.name}, '%')
+            </if>
+        </if>
+        <if test="sortData != null and sortData != ''">
+            ORDER BY ${sortData} ${sortType}
+        </if>
+        LIMIT #{page}, #{size}
+    </select>
+
+    <delete id="deletePermissionById" parameterType="Long">
+        DELETE FROM t_permission WHERE permissionId = #{permissionId}
+    </delete>
+
+    <select id="findByRoleId" parameterType="Long" resultType="com.husen.dao.po.PermissionPo">
+        SELECT p.permissionId, p.name, p.description, p.menuId FROM t_permission p INNER JOIN t_role_permission rp ON p.permissionId = rp.permissionId AND rp.roleId = #{roleId}
+    </select>
+
+    <select id="findAll" resultType="com.husen.dao.po.PermissionPo">
+        SELECT permissionId, name, description, menuId FROM t_permission WHERE permissionId NOT IN (SELECT permissionId FROM t_role_permission)
+    </select>
+
+    <update id="clearMenu" parameterType="Long">
+        UPDATE t_permission SET menuId = NULL WHERE permissionId = #{permissionId}
+    </update>
+
+    <update id="addMenu" parameterType="com.husen.dao.vo.PermissionMenuVo">
+        UPDATE t_permission SET menuId = #{menuId} WHERE permissionId = #{permissionId}
+    </update>
+</mapper>
