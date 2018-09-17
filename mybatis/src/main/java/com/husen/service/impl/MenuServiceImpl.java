@@ -22,8 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -84,7 +82,6 @@ public class MenuServiceImpl extends Base implements MenuService {
      * @Cacheable 启用缓存 使用Cache : menus_cache, key : getAllBottomMenus + fatherMenuId
      */
     @Override
-    @Cacheable(value = "menus_cache", key = "'getAllBottomMenus'.concat(fatherMenuId)")
     public List<Map<String, String>> getAllBottomMenus(Long fatherMenuId) {
         List<Map<String, String>> result = new ArrayList<>();
         List<MenuPo> topMenus = menuMapper.bottomMenus(fatherMenuId);
@@ -99,7 +96,6 @@ public class MenuServiceImpl extends Base implements MenuService {
      * 4，是菜单还是按钮，默认是菜单，菜单的地址是访问地址，按钮的地址是按钮的资源权限名称
      **/
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<MenuPo> saveMenu(MenuPo menuPo) {
         //默认是菜单
@@ -138,7 +134,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<Long> deleteMenuById(Long menuId) {
         if(null == menuId) {
@@ -155,7 +150,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "'getAllTopMenus'")
     public List<Map<String, String>> getAllTopMenus() {
         List<Map<String, String>> result = new ArrayList<>();
         List<MenuPo> topMenus = menuMapper.topMenus();
@@ -164,7 +158,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "'getAllMiddleMenus'.concat(fatherMenuId)")
     public List<Map<String, String>> getAllMiddleMenus(Long fatherMenuId) {
         List<Map<String, String>> result = new ArrayList<>();
         List<MenuPo> topMenus = menuMapper.middleMenus(fatherMenuId);
@@ -173,21 +166,18 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "'findAllTopMenus'")
     public List<MenuVo> findAllTopMenus() {
         List<MenuPo> pos = menuMapper.topMenus();
         return po2Vo(pos);
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "'getMiddleMenusByFatherId'.concat(fatherMenuId)")
     public List<MenuVo> getMiddleMenusByFatherId(Long fatherMenuId) {
         List<MenuPo> pos = menuMapper.middleMenus(fatherMenuId);
         return po2Vo(pos);
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "'getAllTreeNodes'")
     public List<TreeNode> getAllTreeNodes() {
         List<MenuPo> topMenus = menuMapper.topMenus();
         List<TreeNode> treeNodes = new ArrayList<>();
@@ -231,7 +221,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<String> saveMenuTree(List<TreeNode> treeNodes) {
         log.info("修改后的菜单树结构为:{}", treeNodes);
@@ -265,7 +254,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "#menuId")
     public MenuVo getMenuById(Long menuId) {
         MenuPo po = menuMapper.findById(menuId);
         MenuVo vo = new MenuVo();
@@ -276,7 +264,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<MenuPo> updateMenuById(MenuPo menuPo) {
         MenuPo byId = menuMapper.findById(menuPo.getMenuId());
@@ -289,7 +276,6 @@ public class MenuServiceImpl extends Base implements MenuService {
 
     @Override
     @Transactional
-    @Cacheable(value = "menus_cache", key = "#user.userId")
     public List<TreeNode> menusVoList(UserPo user) {
         List<TreeNode> result = new ArrayList<>();
         if(Objects.isNull(user)) {
@@ -363,7 +349,6 @@ public class MenuServiceImpl extends Base implements MenuService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "#requestURI")
     public MenusVo isPage(String requestURI) {
         MenusVo vo = new MenusVo();
         MenuPo urlMenu = menuMapper.findByUrl(requestURI);

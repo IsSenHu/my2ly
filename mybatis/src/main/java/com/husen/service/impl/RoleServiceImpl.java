@@ -19,7 +19,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpSession;
@@ -69,7 +68,6 @@ public class RoleServiceImpl extends Base implements RoleService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<String> saveRolePermission(List<TreeNode> treeNodes, HttpSession session) {
         log.info("树节点数据为:{}", treeNodes);
@@ -113,7 +111,6 @@ public class RoleServiceImpl extends Base implements RoleService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<Long> deleteRoleById(Long roleId) {
         if(null == roleId) {

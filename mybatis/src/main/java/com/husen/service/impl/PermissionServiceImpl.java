@@ -17,11 +17,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 
 /**
@@ -75,7 +72,6 @@ public class PermissionServiceImpl extends Base implements PermissionService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", allEntries = true)
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<Long> deletePermissionById(Long permissionId) {
         if(null == permissionId) {
@@ -92,7 +88,6 @@ public class PermissionServiceImpl extends Base implements PermissionService {
     }
 
     @Override
-    @Cacheable(value = "menus_cache", key = "#permissionId")
     public Map<String, List<MenuPo>> showMenusByPermissionId(Long permissionId) {
         Map<String, List<MenuPo>> result = new HashMap<>(2);
         if(null == permissionId) {
@@ -112,7 +107,6 @@ public class PermissionServiceImpl extends Base implements PermissionService {
     }
 
     @Override
-    @CacheEvict(value = "menus_cache", key = "#vo.permissionId")
     @Transactional(rollbackFor = RuntimeException.class)
     public CommonResponse<Map<String, List<MenuPo>>> savePermissionMenu(PermissionMenuVo vo) {
         //如果传递过来的menuId=0则是清除当前权限所关联的菜单
