@@ -146,22 +146,23 @@ public class EmailServiceImpl extends Base implements EmailService {
         if(null != user) {
             Set<String> emailIdSet = zSet.range(flag + "_" + USER_EMAIL + user.getUserId(), offset, end);
             List<EmailViewVo> emails = new ArrayList<>();
-            emailIdSet.forEach(id -> {
-                Map<Object, Object> entries = hash.entries(EMAIL + id);
-                EmailViewVo emailViewVo = getEmail(entries);
-                switch (flag) {
-                    case DRAFT : {
-                        emailViewVo.setShowDraft("/writeEmail?emailId=" + emailViewVo.getId());
-                        break;
+            if(null != emailIdSet) {
+                emailIdSet.forEach(id -> {
+                    Map<Object, Object> entries = hash.entries(EMAIL + id);
+                    EmailViewVo emailViewVo = getEmail(entries);
+                    switch (flag) {
+                        case DRAFT: {
+                            emailViewVo.setShowDraft("/writeEmail?emailId=" + emailViewVo.getId());
+                            break;
+                        }
+                        case SEND: {
+                            emailViewVo.setShowDraft("/readEmail?emailId=" + emailViewVo.getId());
+                            break;
+                        }
                     }
-                    case SEND : {
-                        emailViewVo.setShowDraft("/readEmail?emailId=" + emailViewVo.getId());
-                        break;
-                    }
-                }
-
-                emails.add(emailViewVo);
-            });
+                    emails.add(emailViewVo);
+                });
+            }
             data.setEmails(emails);
             data.setOffset(offset);
             Long count = zSet.count(flag + "_" + USER_EMAIL + user.getUserId(), Long.MIN_VALUE, Long.MAX_VALUE);
