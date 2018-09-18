@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class HelloHandler {
     public Mono<ServerResponse> hello(ServerRequest request) {
-        return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON_UTF8)
                 .body(BodyInserters.fromObject("你好，世界，世界说，不是我的错!"));
     }
 }
