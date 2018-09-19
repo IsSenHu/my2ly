@@ -18,6 +18,7 @@ import java.util.List;
  */
 @Configuration
 public class RedisConfig {
+    /**是否使用集群模式*/
     private static final boolean CUSTER_ENABLE = false;
     /**
      * @return jedisConnectionFactory
@@ -95,7 +96,7 @@ public class RedisConfig {
     public StringRedisTemplate stringRedisTemplate(JedisConnectionFactory connectionFactory) {
         StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
         stringRedisTemplate.setConnectionFactory(connectionFactory);
-        //开启事务
+        //开启事务支持
         stringRedisTemplate.setEnableTransactionSupport(true);
         return stringRedisTemplate;
     }
