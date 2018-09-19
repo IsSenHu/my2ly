@@ -3,18 +3,22 @@ package com.husen.config.redis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisClientConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import redis.clients.jedis.JedisPoolConfig;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * Redis的配置文件，包括集群和单机模式
  * Created by HuSen on 2018/8/31 11:30.
  */
 @Configuration
 public class RedisConfig {
-
+    private static final boolean CUSTER_ENABLE = false;
     /**
      * @return jedisConnectionFactory
      */
@@ -56,14 +60,30 @@ public class RedisConfig {
         //在创建之前检查pool的有效性 默认false
         poolConfig.setTestOnCreate(false);
 
-        //创建单节点配置
-        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration("127.0.0.1", 6379);
-        //使用数据库1
-        standaloneConfiguration.setDatabase(1);
         //连接池Client Builder
         JedisClientConfiguration.JedisPoolingClientConfigurationBuilder poolingClientConfigurationBuilder = JedisClientConfiguration.builder().usePooling().poolConfig(poolConfig);
-        //创建连接工厂
-        return new JedisConnectionFactory(standaloneConfiguration, poolingClientConfigurationBuilder.build());
+        if(CUSTER_ENABLE) {
+            //****************创建集群配置****************//
+            List<String> nodes = new ArrayList<>();
+            nodes.add("192.168.162.132:6379");
+            nodes.add("192.168.162.133:6379");
+            nodes.add("192.168.162.134:6379");
+            nodes.add("192.168.162.135:6379");
+            nodes.add("192.168.162.136:6379");
+            nodes.add("192.168.162.137:6379");
+            RedisClusterConfiguration redisClusterConfiguration = new RedisClusterConfiguration(nodes);
+            //最大重定向次数
+            redisClusterConfiguration.setMaxRedirects(2);
+            //创建连接工厂
+            return new JedisConnectionFactory(redisClusterConfiguration, poolingClientConfigurationBuilder.build());
+        }else {
+            //****************创建单节点配置****************//
+            RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration("127.0.0.1", 6379);
+            //使用数据库1
+            standaloneConfiguration.setDatabase(1);
+            //创建连接工厂
+            return new JedisConnectionFactory(standaloneConfiguration, poolingClientConfigurationBuilder.build());
+        }
     }
 
     /**
