@@ -15,6 +15,7 @@ import java.util.Map;
 /**
  * Created by HuSen on 2018/7/5 13:18.
  */
+@SuppressWarnings("WeakerAccess")
 public class Base {
 
     public static <T> CommonResponse<T> commonResponse(T data, String result) {
