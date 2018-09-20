@@ -81,9 +81,9 @@ public class EmailServiceImpl extends Base implements EmailService {
                     emailVo.setFrom(user.getEmail());
                     stringRedisTemplate.multi();
                     //保存邮件
-                    hash.putAll(EMAIL + emailVo.getEmailId(), getMap(emailVo));
+                    hash.putAll("{" + user.getUserId() + "}:" + EMAIL + emailVo.getEmailId(), getMap(emailVo));
                     //保存用户邮件信息
-                    zSet.add(DRAFT + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
+                    zSet.add("{" + user.getUserId() + "}:" + DRAFT + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
                     stringRedisTemplate.exec();
                 }
             }
@@ -109,9 +109,9 @@ public class EmailServiceImpl extends Base implements EmailService {
                         emailVo.setState(EmailVo.SEND_SUCCESS);
                         stringRedisTemplate.multi();
                         //保存邮件
-                        hash.putAll(EMAIL + emailVo.getEmailId(), getMap(emailVo));
+                        hash.putAll("{" + user.getUserId() + "}:" + EMAIL + emailVo.getEmailId(), getMap(emailVo));
                         //保存用户邮件信息
-                        zSet.add(SEND + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
+                        zSet.add("{" + user.getUserId() + "}:" + SEND + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
                         stringRedisTemplate.exec();
                     }
                     //发送失败进入草稿箱
@@ -122,9 +122,9 @@ public class EmailServiceImpl extends Base implements EmailService {
                         emailVo.setFrom(user.getEmail());
                         stringRedisTemplate.multi();
                         //保存邮件
-                        hash.putAll(EMAIL + emailVo.getEmailId(), getMap(emailVo));
+                        hash.putAll("{" + user.getUserId() + "}:" + EMAIL + emailVo.getEmailId(), getMap(emailVo));
                         //保存用户邮件信息
-                        zSet.add(DRAFT + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
+                        zSet.add("{" + user.getUserId() + "}:" + DRAFT + "_" + USER_EMAIL + user.getUserId(), emailVo.getEmailId(), System.currentTimeMillis());
                         stringRedisTemplate.exec();
                     }
                 }
@@ -144,28 +144,29 @@ public class EmailServiceImpl extends Base implements EmailService {
         UserPo user = getUser();
         EmailData data = new EmailData();
         if(null != user) {
-            Set<String> emailIdSet = zSet.range(flag + "_" + USER_EMAIL + user.getUserId(), offset, end);
+            Set<String> emailIdSet = zSet.range("{" + user.getUserId() + "}:" + flag + "_" + USER_EMAIL + user.getUserId(), offset, end);
             List<EmailViewVo> emails = new ArrayList<>();
-            emailIdSet.forEach(id -> {
-                Map<Object, Object> entries = hash.entries(EMAIL + id);
-                EmailViewVo emailViewVo = getEmail(entries);
-                switch (flag) {
-                    case DRAFT : {
-                        emailViewVo.setShowDraft("/writeEmail?emailId=" + emailViewVo.getId());
-                        break;
+            if(null != emailIdSet) {
+                emailIdSet.forEach(id -> {
+                    Map<Object, Object> entries = hash.entries("{" + user.getUserId() + "}:" + EMAIL + id);
+                    EmailViewVo emailViewVo = getEmail(entries);
+                    switch (flag) {
+                        case DRAFT: {
+                            emailViewVo.setShowDraft("/writeEmail?emailId=" + emailViewVo.getId());
+                            break;
+                        }
+                        case SEND: {
+                            emailViewVo.setShowDraft("/readEmail?emailId=" + emailViewVo.getId());
+                            break;
+                        }
                     }
-                    case SEND : {
-                        emailViewVo.setShowDraft("/readEmail?emailId=" + emailViewVo.getId());
-                        break;
-                    }
-                }
-
-                emails.add(emailViewVo);
-            });
+                    emails.add(emailViewVo);
+                });
+            }
             data.setEmails(emails);
             data.setOffset(offset);
-            Long count = zSet.count(flag + "_" + USER_EMAIL + user.getUserId(), Long.MIN_VALUE, Long.MAX_VALUE);
-            data.setEnd(end <= count ? end : count);
+            Long count = zSet.count("{" + user.getUserId() + "}:" + flag + "_" + USER_EMAIL + user.getUserId(), Long.MIN_VALUE, Long.MAX_VALUE);
+            data.setEnd(null != count ? end <= count ? end : count : 0);
             data.setTotal(count);
             data.setDraftNumber(count);
         }
@@ -183,8 +184,12 @@ public class EmailServiceImpl extends Base implements EmailService {
             return null;
         }
         HashOperations<String, Object, Object> hash = stringRedisTemplate.opsForHash();
-        Map<Object, Object> entries = hash.entries(EMAIL + emailId);
-        return getEmailVo(entries);
+        UserPo user = getUser();
+        if(null != user) {
+            Map<Object, Object> entries = hash.entries("{" + user.getUserId() + "}:" + EMAIL + emailId);
+            return getEmailVo(entries);
+        }
+        return null;
     }
 
     /**
