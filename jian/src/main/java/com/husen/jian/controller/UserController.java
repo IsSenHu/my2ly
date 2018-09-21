@@ -1,7 +1,8 @@
 package com.husen.jian.controller;
 
+import com.husen.base.CommonResponse;
+import com.husen.jian.dao.vo.UserVo;
 import com.husen.jian.service.UserService;
-import com.husen.jian.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
