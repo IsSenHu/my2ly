@@ -1,19 +1,18 @@
 package com.husen.jian.service.impl;
 
-import com.husen.base.Base;
 import com.husen.base.CommonResponse;
 import com.husen.jian.dao.po.UserPo;
 import com.husen.jian.dao.repository.UserRepository;
 import com.husen.jian.dao.vo.UserVo;
 import com.husen.jian.jwt.JwtUtil;
 import com.husen.jian.service.AuthService;
+import com.husen.jian.service.BasicService;
 import com.husen.jian.tran.UserVo2UserPo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-
 import java.util.Objects;
 
 /**
@@ -21,7 +20,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Service
-public class AuthServiceImpl extends Base implements AuthService {
+public class AuthServiceImpl extends BasicService implements AuthService {
     private final JwtUtil jwtUtil;
     private final UserVo2UserPo userVo2UserPo;
     private final UserRepository userRepository;

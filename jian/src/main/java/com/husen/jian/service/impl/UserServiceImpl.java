@@ -1,12 +1,12 @@
 package com.husen.jian.service.impl;
 
-import com.husen.base.Base;
 import com.husen.base.CommonResponse;
 import com.husen.jian.dao.po.RolePo;
 import com.husen.jian.dao.po.UserPo;
 import com.husen.jian.dao.repository.UserRepository;
 import com.husen.jian.dao.vo.UserVo;
 import com.husen.jian.jwt.JwtUtil;
+import com.husen.jian.service.BasicService;
 import com.husen.jian.service.UserService;
 import com.husen.jian.tran.UserPo2UserVo;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class UserServiceImpl extends Base implements UserService {
+public class UserServiceImpl extends BasicService implements UserService {
     private static final Map<Long, UserVo> data = new ConcurrentHashMap<>();
     private final UserPo2UserVo userPo2UserVo;
     private final UserRepository userRepository;
