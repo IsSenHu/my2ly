@@ -41,21 +41,21 @@ public class AuthServiceImpl extends BasicService implements AuthService {
     @Override
     public Mono<CommonResponse<String>> getToken(UserVo userVo) {
         return Mono.justOrEmpty(userVo)
-                .map(vo -> {
-                    UserPo userPo = userRepository.findByUsername(vo.getUsername());
-                    if(!Objects.isNull(userPo)) {
-                        if(passwordEncoder.matches(userVo.getPassword(), userPo.getPassword())) {
-                            String token = userPo.getToken();
-                            if(jwtUtil.isTokenExpired(userPo.getToken())) {
-                                token = jwtUtil.generateToken(userVo2UserPo.apply(userVo));
-                                userPo.setToken(token);
-                                userRepository.save(userPo);
-                            }
-                            return commonResponse(token, Constant.SUCCESS);
-                        }
+            .map(vo -> {
+                UserPo userPo = userRepository.findByUsername(vo.getUsername());
+                //如果认证成功
+                if(!Objects.isNull(userPo) && passwordEncoder.matches(userVo.getPassword(), userPo.getPassword())) {
+                    String token = userPo.getToken();
+                    if(jwtUtil.isTokenExpired(userPo.getToken())) {
+                        token = jwtUtil.generateToken(userVo2UserPo.apply(userVo));
+                        userPo.setToken(token);
+                        userRepository.save(userPo);
                     }
-                    return commonResponse("", Constant.FAIL);
-                })
-                .switchIfEmpty(Mono.just(commonResponse("", Constant.PARAM_EXCEPTION)));
+                    return commonResponse(token, Constant.SUCCESS);
+                }
+                //否则认证失败，返回""
+                return commonResponse("", Constant.FAIL);
+            })
+            .switchIfEmpty(Mono.just(commonResponse("", Constant.PARAM_EXCEPTION)));
     }
 }

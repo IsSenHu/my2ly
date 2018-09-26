@@ -62,16 +62,16 @@ public class UserServiceImpl extends BasicService implements UserService {
     @Override
     public Mono<CommonResponse<UserVo>> getUserInfo(UserVo userVo) {
         return Mono.justOrEmpty(userVo)
-                .map(vo -> {
-                    if(StringUtils.isNotBlank(vo.getToken())) {
-                        UserPo userPo = userRepository.findByToken(userVo.getToken());
-                        if(!Objects.isNull(userPo)) {
-                            return commonResponse(userPo2UserVo.apply(userPo), Constant.SUCCESS);
-                        }
+            .map(vo -> {
+                if(StringUtils.isNotBlank(vo.getToken())) {
+                    UserPo userPo = userRepository.findByToken(userVo.getToken());
+                    if(!Objects.isNull(userPo)) {
+                        return commonResponse(userPo2UserVo.apply(userPo), Constant.SUCCESS);
                     }
-                    return commonResponse(userVo, Constant.AUTH_FAIL);
-                })
-                .switchIfEmpty(Mono.just(commonResponse(userVo, Constant.PARAM_EXCEPTION)));
+                }
+                return commonResponse(userVo, Constant.AUTH_FAIL);
+            })
+            .switchIfEmpty(Mono.just(commonResponse(userVo, Constant.PARAM_EXCEPTION)));
     }
 
     @Override
