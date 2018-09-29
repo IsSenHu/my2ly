@@ -101,8 +101,7 @@ public class UserServiceImpl extends BasicService implements UserService {
                 user -> user.setAuthorities(
                         optional
                                 .map(UserPo::getRolePoList)
-                                .map(
-                                        rolePos -> rolePos.stream()
+                                .map(rolePos -> rolePos.stream()
                                         .map(RolePo::getRoleName)
                                         .map(SimpleGrantedAuthority::new).collect(Collectors.toList())
                                 )
