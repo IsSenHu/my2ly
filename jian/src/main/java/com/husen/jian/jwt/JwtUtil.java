@@ -4,6 +4,7 @@ import com.husen.jian.dao.po.UserPo;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -146,15 +147,15 @@ public class JwtUtil {
      * @return 刷新token
      */
     public String refreshToken(String token) {
-        String refreshedToken;
+        String newToken;
         try {
             final Claims claims = getClaimsFromToken(token);
             claims.put(CLAIM_KEY_CREATED, new Date());
-            refreshedToken = generateToken(claims);
+            newToken = generateToken(claims);
         } catch (Exception e) {
-            refreshedToken = null;
+            newToken = null;
         }
-        return refreshedToken;
+        return newToken;
     }
 
     /**
@@ -166,8 +167,7 @@ public class JwtUtil {
     public Boolean validateToken(String token, UserDetails userDetails) {
         UserPo user = (UserPo) userDetails;
         final String username = getUserAccountFromToken(token);
-        final Date created = getCreatedDateFromToken(token);
-        return username.equals(user.getUsername())
+        return StringUtils.equals(username, user.getUsername())
                 && !isTokenExpired(token);
     }
 }
