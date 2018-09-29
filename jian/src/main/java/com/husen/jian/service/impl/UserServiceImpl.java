@@ -9,6 +9,7 @@ import com.husen.jian.jwt.JwtUtil;
 import com.husen.jian.service.BasicService;
 import com.husen.jian.service.UserService;
 import com.husen.jian.tran.UserPo2UserVo;
+import com.husen.utils.LyCollectionUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -105,7 +106,9 @@ public class UserServiceImpl extends BasicService implements UserService {
                                         .map(RolePo::getRoleName)
                                         .map(SimpleGrantedAuthority::new).collect(Collectors.toList())
                                 )
-                                .orElse(new ArrayList<>())));
-        return optional.orElse(new UserPo());
+                                .orElse(LyCollectionUtil.EMPTY_LIST)
+                )
+        );
+        return optional.orElse(null);
     }
 }
