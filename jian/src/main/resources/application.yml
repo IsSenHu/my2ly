@@ -1,9 +1,9 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/jian?useUnicode=true&characterEncoding=utf-8&useSSL=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://118.24.38.46:3306/jian?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&
     username: root
-    password: 521428
+    password: 521428Slly
   redis:
     password: 521428Slyt
     port: 6379
@@ -16,7 +16,8 @@ spring:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
     open-in-view: true
-######thymeleaf######
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  ######thymeleaf######
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

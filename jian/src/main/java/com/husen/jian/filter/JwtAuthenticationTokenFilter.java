@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,18 +41,17 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-        String authHeader = httpServletRequest.getHeader(this.tokenHeader);
-        if (StringUtils.isNotBlank(authHeader) && authHeader.startsWith(tokenHead)) {
-            final String authToken = authHeader.substring(tokenHead.length());
-            String username = jwtUtil.getUserAccountFromToken(authHeader);
+    protected void doFilterInternal(@NonNull HttpServletRequest httpServletRequest, @NonNull HttpServletResponse httpServletResponse, @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String token = httpServletRequest.getHeader(this.tokenHeader);
+        if (StringUtils.isNotBlank(token) && token.startsWith(tokenHead)) {
+            String username = jwtUtil.getUserAccountFromToken(token);
             log.info("token认证结果，用户名:{}", username);
             //如果根据token能找出用户名 则token校验通过
             if (StringUtils.isNotBlank(username) && SecurityContextHolder.getContext().getAuthentication() == null) {
                 //根据username去数据库中查询user数据
                 UserDetails userDetails = this.userService.loadUserByUsername(username);
                 //校验token是否正确
-                if (jwtUtil.validateToken(authHeader, userDetails)) {
+                if (jwtUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(

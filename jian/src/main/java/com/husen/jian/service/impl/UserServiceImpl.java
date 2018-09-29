@@ -17,12 +17,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.io.FileNotFoundException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -60,6 +59,7 @@ public class UserServiceImpl extends BasicService implements UserService {
      * @return 验证成功响应用户信息 失败响应null
      */
     @Override
+    @Transactional
     public Mono<CommonResponse<UserVo>> getUserInfo(UserVo userVo) {
         return Mono.justOrEmpty(userVo)
             .map(vo -> {
@@ -91,13 +91,21 @@ public class UserServiceImpl extends BasicService implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserPo userPo = userRepository.findByUsername(username);
         //加载用户角色
-        List<RolePo> rolePoList = userPo.getRolePoList();
-        if(CollectionUtils.isNotEmpty(rolePoList)) {
-            userPo.setAuthorities(rolePoList.stream().map(rolePo -> new SimpleGrantedAuthority(rolePo.getRoleName())).collect(Collectors.toList()));
-        }
-        return userPo;
+        Optional<UserPo> optional = Optional.ofNullable(userPo);
+        optional.ifPresent(
+                user -> user.setAuthorities(
+                        optional
+                                .map(UserPo::getRolePoList)
+                                .map(
+                                        rolePos -> rolePos.stream()
+                                        .map(RolePo::getRoleName)
+                                        .map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                                )
+                                .orElse(new ArrayList<>())));
+        return optional.orElse(new UserPo());
     }
 }

@@ -22,7 +22,7 @@ public class RolePo implements Serializable {
     private String roleName;
 
     /**该角色可访问的页面*/
-    @OneToOne(targetEntity = PagePo.class, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = PagePo.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "pageId")
     private PagePo pagePo;
 }

@@ -46,7 +46,7 @@ public class UserPo implements UserDetails {
     /**
      * 用户拥有的角色 单边多对多
      * */
-    @ManyToMany(targetEntity = RolePo.class, fetch = FetchType.EAGER)
+    @ManyToMany(targetEntity = RolePo.class, fetch = FetchType.LAZY)
     @JoinTable(name = "t_user_role",
             joinColumns = {@JoinColumn(name = "userId", referencedColumnName = "userId")},
             inverseJoinColumns = {@JoinColumn(name = "roleId", referencedColumnName = "roleId")})

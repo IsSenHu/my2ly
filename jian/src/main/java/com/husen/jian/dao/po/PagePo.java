@@ -46,7 +46,7 @@ public class PagePo implements Serializable {
     @Column(name = "icon", length = 30)
     private String icon;
     /**该页面需要的角色 为空则所有人可访问*/
-    @OneToOne(targetEntity = RolePo.class, fetch = FetchType.EAGER)
+    @OneToOne(targetEntity = RolePo.class, fetch = FetchType.LAZY)
     @JoinColumn(name = "roleId")
     private RolePo rolePo;
     /**是否缓存*/
